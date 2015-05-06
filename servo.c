@@ -8,18 +8,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEVICE   "/dev/cu.usbserial-FTH7PKJS"
-#define BAUDRATE B9600
-
-int deviceOpen(void);
+int deviceOpen(char*, char*);
 void deviceClose(int);
 
-int main(void){
+int main(int argc, char*argv[]){
     char data;
 
-    fd = deviceOpen();
+    fd = deviceOpen(argv[1], argv[2]);
     if(fd == -1){
-        printf("%s doesn't open.\n", DEVICE);
+        printf("%s doesn't open.\n", argv[1]);
         return 0;
     }
 
@@ -32,11 +29,11 @@ int main(void){
     return 0;
 }
 
-int deviceOpen(void){
+int deviceOpen(char *device, char *baudrate){
     int fd;
     struct termios oldtio, newtio;
     
-    fd = open(DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
     if(fd < 0){
         return -1;
@@ -44,7 +41,7 @@ int deviceOpen(void){
     
     tcgetattr(fd, &oldtio);
     newtio = oldtio;
-    cfsetspeed(&newtio, BAUDRATE);
+    cfsetspeed(&newtio, baudrate);
     tcflush(fd, TCIFLUSH);
     tcsetattr(fd, TCSANOW, &newtio);
 
