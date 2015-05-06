@@ -8,13 +8,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEVICE   "/dev/tty.usbserial-FTGCKD3V"
-#define BAUDRATE B115200
+#define DEVICE   "/dev/tty.usbserial-FTH7PKJS"
+#define BAUDRATE B9600
 
 int main(void){
     int fd;
     struct termios oldtio, newtio;
-    char buf[20];
+    char data;
 
     fd = open(DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
@@ -29,8 +29,8 @@ int main(void){
     tcflush(fd, TCIFLUSH);
     tcsetattr(fd, TCSANOW, &newtio);
 
-    strcpy(buf, "hello");
-    write(fd, buf, sizeof(buf));
+    data = 10;
+    write(fd, &data, sizeof(data));
     printf("write\n");
 
     tcsetattr(fd, TCSANOW, &oldtio);
