@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEVICE   "/dev/tty.usbserial-FTH7PKJS"
+#define DEVICE   "/dev/cu.usbserial-FTH7PKJS"
 #define BAUDRATE B9600
 
 int main(void){
@@ -29,7 +29,7 @@ int main(void){
     tcflush(fd, TCIFLUSH);
     tcsetattr(fd, TCSANOW, &newtio);
 
-    data = 10;
+    data = 97;
     write(fd, &data, sizeof(data));
     printf("write\n");
 
