@@ -8,47 +8,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-int deviceOpen(char*, char*);
-void deviceClose(int);
+#define DEVICE   "/dev/cu.usbserial-FTH7PKJS"
+#define BAUDRATE B9600
 
-int main(int argc, char*argv[]){
+int main(void){
+    int fd;
+    struct termios oldtio, newtio;
     char data;
 
-    fd = deviceOpen(argv[1], argv[2]);
-    if(fd == -1){
-        printf("%s doesn't open.\n", argv[1]);
+    fd = open(DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+
+    if(fd < 0){
+        printf("%s doesn't open.\n", DEVICE);
         return 0;
     }
+
+    tcgetattr(fd, &oldtio);
+    newtio = oldtio;
+    cfsetspeed(&newtio, BAUDRATE);
+    tcflush(fd, TCIFLUSH);
+    tcsetattr(fd, TCSANOW, &newtio);
 
     data = 97;
     write(fd, &data, sizeof(data));
     printf("write\n");
 
-    deviceClose(fd);
-
-    return 0;
-}
-
-int deviceOpen(char *device, char *baudrate){
-    int fd;
-    struct termios oldtio, newtio;
-    
-    fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
-
-    if(fd < 0){
-        return -1;
-    }
-    
-    tcgetattr(fd, &oldtio);
-    newtio = oldtio;
-    cfsetspeed(&newtio, baudrate);
-    tcflush(fd, TCIFLUSH);
-    tcsetattr(fd, TCSANOW, &newtio);
-
-    return fd;
-}
-
-void deviceClose(int fd){ 
     tcsetattr(fd, TCSANOW, &oldtio);
     close(fd);
+
+    return 0;
 }
